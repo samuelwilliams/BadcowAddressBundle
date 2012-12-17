@@ -1,0 +1,14 @@
+{
+    "name": "badcow/address-bundle",
+    "description": "Bundle for managing and storing addresses.",
+    "authors": [
+        {
+            "name": "Sam Williams",
+            "email": "sam@badcow.co"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "willdurand/geocoder-bundle": "*"
+    }
+}
