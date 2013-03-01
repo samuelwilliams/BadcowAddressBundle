@@ -7,11 +7,12 @@
             "email": "sam@badcow.co"
         }
     ],
+    "license": "MIT",
     "minimum-stability": "dev",
     "require": {
         "willdurand/geocoder-bundle": "*"
     },
     "autoload": {
         "psr-0": { "Badcow\\AddressBundle": "" }
-    },
+    }
 }
