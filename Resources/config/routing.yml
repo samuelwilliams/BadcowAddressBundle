@@ -1,3 +1,0 @@
-badcow_address_homepage:
-    pattern:  /hello/{name}
-    defaults: { _controller: BadcowAddressBundle:Default:index }

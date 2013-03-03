@@ -8,12 +8,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Badcow\AddressBundle\Entity;
+namespace Badcow\AddressBundle\Geocode;
 
-interface AddressInterface
+interface GeocodableInterface
 {
     /**
-     * Full address string
+     * @param float $latitude
+     */
+    public function setLatitude($latitude);
+
+    /**
+     * @param float $longitude
+     */
+    public function setLongitude($longitude);
+
+    /**
+     * Full address as string
      *
      * @return string
      */

@@ -2,22 +2,34 @@
 
 namespace Badcow\AddressBundle\Command;
 
+use Badcow\AddressBundle\Entity\BaseAddress;
+use Geocoder\Exception\NoResultException;
+use Geocoder\Result\Geocoded;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Badcow\AddressBundle\Entity\BaseAddress;
-use Geocoder\Result\Geocoded;
 
 class GeocodeCommand extends ContainerAwareCommand
 {
+    /**
+     * Limits the rate of queries
+     */
+    const QUERY_SLEEP_TIME = 100;
+
+    /**
+     * {@inheritdoc}
+     */
     public function configure()
     {
-        $this->setName('badcow_address:gecode');
+        $this->setName('badcow:address:geocode');
         $this->setDescription('Geocode all addresses without latitude and longitude');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $geocoder = $this->getGeocoder();
@@ -30,9 +42,14 @@ class GeocodeCommand extends ContainerAwareCommand
         /** @var BaseAddress $address */
         foreach ($addresses as $address) {
             $output->writeln(sprintf('Geocoding "%s"', $address));
-            $geocoded = $geocoder->geocode((string) $address);
-            $this->updateAddress($address, $geocoded);
-            usleep(100); //Rate limit the queries
+            try {
+                $geocoded = $geocoder->geocode((string) $address);
+                $this->updateAddress($address, $geocoded);
+            } catch (NoResultException $e) {
+                $output->writeln(sprintf('<error>Unable to geocode address: %s</error>', $address));
+            }
+
+            usleep(self::QUERY_SLEEP_TIME);
         }
     }
 
@@ -47,7 +64,7 @@ class GeocodeCommand extends ContainerAwareCommand
 
         /** @var \Doctrine\ORM\QueryBuilder $qb */
         $qb = $doctrine
-                ->getRepository('BadcowAddressBundle:StreetAddress')
+                ->getRepository('BadcowAddressBundle:BaseAddress')
                 ->createQueryBuilder('a');
 
         $qb->add('where', $qb->expr()->orX(
@@ -75,8 +92,8 @@ class GeocodeCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param \Badcow\AddressBundle\Entity\BaseAddress $address
-     * @param \Geocoder\Result\Geocoded $geocoded
+     * @param BaseAddress $address
+     * @param Geocoded $geocoded
      */
     private function updateAddress(BaseAddress $address, Geocoded $geocoded)
     {
@@ -88,4 +105,3 @@ class GeocodeCommand extends ContainerAwareCommand
         $em->flush();
     }
 }
-

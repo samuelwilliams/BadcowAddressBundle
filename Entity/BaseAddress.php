@@ -1,8 +1,17 @@
 <?php
+/*
+ * This file is part of the Badcow Address Bundle.
+ *
+ * (c) Samuel Williams <sam@badcow.co>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Badcow\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Badcow\AddressBundle\Geocode\GeocodableInterface;
 
 /**
  * Represents an Invoice.
@@ -12,12 +21,13 @@ use Doctrine\ORM\Mapping as ORM;
  *   "PO_BOX" = "PoBoxAddress",
  *   "STREET_ADDRESS" = "StreetAddress",
  *   "UNFORMATTED_ADDRESS" = "UnformattedAddress",
+ *   "SEMIFORMATTED_ADDRESS" = "SemiFormattedAddress",
  * })
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\Table(name="badcow_address")
  */
-abstract class BaseAddress implements AddressInterface
+abstract class BaseAddress implements AddressInterface, GeocodableInterface
 {
     /**
      * @var int
@@ -81,7 +91,7 @@ abstract class BaseAddress implements AddressInterface
     }
 
     /**
-     * @param float $latitude
+     * {@inheritdoc}
      */
     public function setLatitude($latitude)
     {
@@ -97,7 +107,7 @@ abstract class BaseAddress implements AddressInterface
     }
 
     /**
-     * @param float $longitude
+     * {@inheritdoc}
      */
     public function setLongitude($longitude)
     {
